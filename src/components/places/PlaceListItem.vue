@@ -4,9 +4,12 @@
 			<div class="card-body">
 				<h5 class="card-title">
 					{{ place.place_number }}
-					<span class="badge bg-success float-end">
-						{{ place.status }}
-					</span>
+					<span :class="`
+                        badge
+                        ${place.status === 'available' ? 'bg-success' : 'bg-danger'}
+                        float-end `">
+                        {{ place.status }}
+                    </span>
 				</h5>
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -30,6 +33,7 @@
                 <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-sm btn-dark"
                     v-if="place.status === 'available'"
+                    @click="reservePlace(place.id)"
                     >
                         Reserve
                     </button>
@@ -53,6 +57,8 @@
 </template>
 
 <script setup>
+import axios from "axios"
+
 
 //define the props
 const props = defineProps({
@@ -62,6 +68,28 @@ const props = defineProps({
 	}
 })
 
+//define the event
+const emit = defineEmits(['updated-place'])
+
+// reserve a place
+const reservePlace = async (placeId) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/api/book/reservation', {
+            place_id: placeId,
+        }, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        emit('updated-place', response.data.place)
+        console.log(response.data);
+    } catch (error) {
+        console.log('Status:', error.response?.status);
+        console.log('Data:', error.response?.data);
+        console.log('Full error:', error);
+    }
+}
 </script>
 
 <style scoped>

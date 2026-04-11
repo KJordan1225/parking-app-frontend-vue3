@@ -4,6 +4,7 @@
             v-for="place in data.places"
             :key="place.id"
             :place="place"
+			@updated-place="updatePlaceInList"
         />
     </div>
 </template>
@@ -26,6 +27,14 @@ const fetchPlaces = async () => {
 		console.log(response.data.data)
 	} catch (error) {
 		console.log(error)
+	}
+}
+
+//update place in places list
+const updatePlaceInList = (updatedPlace) => {
+	const index = data.places.findIndex(p => p.id === updatedPlace.id)
+	if (index !== -1) {
+		data.places[index] = updatedPlace
 	}
 }
 
