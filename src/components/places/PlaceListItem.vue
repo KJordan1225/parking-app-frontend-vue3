@@ -64,6 +64,7 @@
 <script setup>
 import axios from "axios"
 import { useToast } from "vue-toastification"
+import { handlePlaceRequest, reservePlaceApi } from "../../config/api"
 
 
 //define the props
@@ -82,24 +83,12 @@ const emit = defineEmits(['updated-place'])
 
 // reserve a place
     const reservePlace = async (placeId) => {
-        try {
-            const response = await axios.post('http://127.0.0.1:8000/api/book/reservation', {
-                place_id: placeId,
-            }, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-            });
-            if(response.data.error) {
-                toast.error(response.data.error, { timeout: 3000 })
-            } else {
-                toast.success(response.data.message, { timeout: 3000 })            
-                emit('updated-place', response.data.place)
-                console.log(response.data.place);
-            }
-        } catch (error) {            
-            console.log('Full error:', error);
+        const resData = await handlePlaceRequest(() => reservePlaceApi(placeId))
+        if(resData) {
+                emit('updated-place', resData.place)
+                toast.success(resData.message, {
+                timeout: 4000
+            }) 
         }
     }
 
